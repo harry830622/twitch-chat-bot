@@ -1,8 +1,16 @@
-const rules = {};
 const defaultDefaultReply = '安安，住哪，幾歲，給虧嗎？';
 
-let defaultReply = defaultDefaultReply;
-let reactionTimeOfReply = 1000;
+let defaultReply = undefined;
+let reactionTimeOfReply = 500; // TODO: Buggy!!!
+let rules = {};
+
+chrome.storage.sync.get(
+  'defaultReply',
+  (obj) => {
+    defaultReply = obj.defaultReply || defaultDefaultReply;
+  }
+);
+// chrome.storage.sync.get('rules', (obj) => {rules = obj.rules;});
 
 let intervalId = undefined;
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -10,10 +18,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case 'ToggleAutoReply':
       if (request.isAutoReplyEnabled) {
         intervalId = enableAutoReply();
+
+        chrome.storage.sync.set({intervalId});
       } else {
-        if (intervalId !== undefined) {
-          clearInterval(intervalId);
-        }
+        chrome.storage.sync.get(
+          'intervalId',
+          (obj) => {
+            intervalId = intervalId || obj.intervalId;
+            clearInterval(intervalId);
+          }
+        );
       }
       break;
     case 'UpdateDefaultReply':
@@ -22,6 +36,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       } else {
         defaultReply = request.replyToUpdate;
       }
+
+      chrome.storage.sync.set({defaultReply});
       break;
     default:
       break;
@@ -54,6 +70,31 @@ const enableAutoReply = () => {
     const chatMessageTextarea = document.querySelector('div.chat-interface textarea.chat_text_input');
     const chatSendMessageBtn = document.querySelector('div.chat-interface div.chat-buttons-container button');
 
+    // let i = 0;
+    // setInterval(() => {
+    //   if (i === newChatLineLIs.length) {
+    //     return;
+    //   }
+
+    //   const fromText = newChatLineLIs[i].querySelector('span.from').innerText;
+
+    //   const selfUserName = document.querySelector('dl dt span.js-username').innerText;
+    //   if (fromText.trim() === '' || fromText === 'Jtv' || fromText === selfUserName) {
+    //     return;
+    //   }
+
+    //   const messageText = newChatLineLIs[i].querySelector('span.message').innerText;
+
+    //   chatMessageTextarea.focus();
+    //   chatMessageTextarea.value = fromText + ' ' + defaultReply;
+    //   chatSendMessageBtn.focus();
+    //   chatSendMessageBtn.click();
+
+    //   // console.log(fromText + ': ' + messageText);
+
+    //   ++i;
+    // }, reactionTimeOfReply);
+
     for (let i = 0; i < newChatLineLIs.length; ++i) {
       const fromText = newChatLineLIs[i].querySelector('span.from').innerText;
 
@@ -64,7 +105,6 @@ const enableAutoReply = () => {
 
       const messageText = newChatLineLIs[i].querySelector('span.message').innerText;
 
-      setTimeout(null, reactionTimeOfReply);
       chatMessageTextarea.focus();
       chatMessageTextarea.value = fromText + ' ' + defaultReply; // TODO: Check rules.
       chatSendMessageBtn.focus();

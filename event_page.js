@@ -2,6 +2,15 @@ const twitchURL = 'https://www.twitch.tv';
 
 let activatedTabId = undefined;
 
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.sync.set(
+    {
+      isAutoReplyEnabled: false,
+      defaultReply: undefined,
+    }
+  );
+});
+
 chrome.tabs.onActivated.addListener((activeInfo) => {
   activatedTabId = activeInfo.tabId;
 
