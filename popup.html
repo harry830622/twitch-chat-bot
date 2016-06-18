@@ -6,8 +6,19 @@
     <title>Twitch Chat Bot</title>
   </head>
   <body>
-    <button id="toggle-auto-reply">Enable auto reply</button>
-    <input type="text" placeholder="Text to reply..." />
+    <div>
+      <button id="toggle-auto-reply">Enable auto reply</button>
+      <input id="default-reply" type="text" placeholder="Default text to reply..." />
+      <button id="update-default-reply">Update</button>
+    </div>
+    <div>
+      <h1>Rules</h1>
+      <div>
+        <input type="text" placeholder="Text included" />
+        <input type="text" placeholder="Text to reply" />
+        <button id="add-rule">+</button>
+      </div>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>

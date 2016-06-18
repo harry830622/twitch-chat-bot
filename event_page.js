@@ -1,6 +1,6 @@
 const twitchURL = 'https://www.twitch.tv';
 
-let activatedTabId = -1;
+let activatedTabId = undefined;
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
   activatedTabId = activeInfo.tabId;
