@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Twitch Chat Bot",
+  "version": "0.0.1",
+
+  "description": "A bot can reply message on Twitch",
+
+  "page_action": {
+    "default_title": "Twitch Chat Bot",
+    "default_popup": "popup.html"
+  },
+
+  "author": "Harry Chang",
+  "background": {
+    "scripts": ["event_page.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.twitch.tv/*"],
+      "js": ["content_script.js"]
+    }
+  ],
+  "permissions": ["tabs"]
+}
