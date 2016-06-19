@@ -2,24 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="bulma.min.css" />
     <link rel="stylesheet" href="popup.css" />
     <title>Twitch Chat Bot</title>
   </head>
   <body>
-    <div>
-      <button id="toggle-auto-reply">Enable auto reply</button>
-      <input id="default-reply" type="text" placeholder="Default text to reply..." />
-      <button id="update-default-reply">Update</button>
+    <div class="control is-grouped">
+      <p class="control">
+        <a id="toggle-auto-reply" class="button is-primary">Enable auto reply</a>
+      </p>
+      <p class="control is-expand">
+        <input id="default-reply" class="input" type="text" placeholder="Default text to reply..." />
+      </p>
+      <p class="control">
+        <a id="update-default-reply" class="button">Update</a>
+      </p>
     </div>
-    <div id="rules-section">
-      <h1>Rules</h1>
-      <button id="clear-all-rules">Clear all</button>
-      <div id="add-rule-row">
-        <input id="rule-text-included" type="text" placeholder="Text included" />
-        <input id="rule-reply" type="text" placeholder="Text to reply" />
-        <button id="add-rule">+</button>
+    <div class="columns is-mobile">
+      <div class="column">
+        <h1 class="title is-4">Rules</h1>
+      </div>
+      <div class="column">
+        <a id="clear-all-rules" class="button is-small is-danger is-pulled-right">Clear all</a>
       </div>
     </div>
+    <div class="control is-grouped">
+      <p class="control">
+        <input id="rule-text-included" class="input" type="text" placeholder="Text included" />
+      </p>
+      <p class="control">
+        <input id="rule-reply" class="input" type="text" placeholder="Text to reply" />
+      </p>
+      <p class="control">
+        <a id="add-rule" class="button is-outlined">+</a>
+      </p>
+    </div>
+    <div id="rules"></div>
     <script src="popup.js"></script>
   </body>
 </html>

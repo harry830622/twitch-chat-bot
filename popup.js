@@ -1,8 +1,9 @@
-const toggleAutoReplyBtn = document.querySelector('button#toggle-auto-reply');
-const defaultReplyInput = document.querySelector('input#default-reply');
-const updateDefaultReplyBtn = document.querySelector('button#update-default-reply');
-const addRuleBtn = document.querySelector('button#add-rule');
-const clearAllRulesBtn = document.querySelector('button#clear-all-rules');
+const toggleAutoReplyBtn = document.querySelector('#toggle-auto-reply');
+const defaultReplyInput = document.querySelector('#default-reply');
+const updateDefaultReplyBtn = document.querySelector('#update-default-reply');
+const addRuleBtn = document.querySelector('#add-rule');
+const clearAllRulesBtn = document.querySelector('#clear-all-rules');
+const rulesDiv = document.querySelector('#rules');
 
 let isAutoReplyEnabled = undefined;
 
@@ -61,14 +62,17 @@ updateDefaultReplyBtn.addEventListener('click', (e) => {
 });
 
 addRuleBtn.addEventListener('click', (e) => {
-  const textIncludedInput = document.querySelector('input#rule-text-included');
-  const replyInput = document.querySelector('input#rule-reply');
+  const textIncludedInput = document.querySelector('#rule-text-included');
+  const replyInput = document.querySelector('#rule-reply');
 
   const textIncluded = textIncludedInput.value.trim();
   const reply = replyInput.value.trim();
   if (textIncluded === '' || reply === '') {
     return;
   }
+
+  textIncludedInput.value = '';
+  replyInput.value = '';
 
   displayRule(textIncluded, reply);
 
@@ -85,7 +89,7 @@ addRuleBtn.addEventListener('click', (e) => {
 });
 
 clearAllRulesBtn.addEventListener('click', (e) => {
-  // TODO: Remove rule spans.
+  rulesDiv.innerHTML = '';
 
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     chrome.tabs.sendMessage(
@@ -98,18 +102,20 @@ clearAllRulesBtn.addEventListener('click', (e) => {
 });
 
 const displayRule = (textIncluded, reply) => {
-  const textIncludedSpan = document.createElement('span');
-  textIncludedSpan.innerHTML = textIncluded;
+  const textIncludedCol = document.createElement('div');
+  textIncludedCol.className += ' column is-5';
+  textIncludedCol.innerHTML = textIncluded;
 
-  const replySpan = document.createElement('span');
-  replySpan.innerHTML = reply;
+  const replyCol = document.createElement('div');
+  replyCol.className += ' column is-5';
+  replyCol.innerHTML = reply;
 
   // TODO: Add delete button.
 
-  const ruleDiv = document.createElement('div');
-  ruleDiv.appendChild(textIncludedSpan);
-  ruleDiv.appendChild(replySpan);
+  const ruleRow = document.createElement('div');
+  ruleRow.className += ' columns is-mobile';
+  ruleRow.appendChild(textIncludedCol);
+  ruleRow.appendChild(replyCol);
 
-  const rulesDiv = document.querySelector('div#rules-section');
-  rulesDiv.appendChild(ruleDiv);
+  rulesDiv.appendChild(ruleRow);
 };
