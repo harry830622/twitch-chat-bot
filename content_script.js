@@ -1,7 +1,7 @@
 const defaultDefaultReply = '安安，住哪，幾歲，給虧嗎？';
 
-let defaultReply = undefined;
-let reactionTimeOfReply = 500; // TODO: Buggy!!!
+let defaultReply = defaultDefaultReply;
+let reactionTimeOfReply = 500; // TODO: Make bot have some reaction time.
 let rules = {};
 
 chrome.storage.sync.get(
@@ -10,7 +10,8 @@ chrome.storage.sync.get(
     defaultReply = obj.defaultReply || defaultDefaultReply;
   }
 );
-// chrome.storage.sync.get('rules', (obj) => {rules = obj.rules;});
+
+chrome.storage.sync.get('rules', (obj) => {rules = obj.rules;});
 
 let intervalId = undefined;
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -38,6 +39,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
 
       chrome.storage.sync.set({defaultReply});
+      break;
+    case 'AddRule':
+      addRule(request.textIncluded, request.reply);
+      break;
+    case 'RemoveRule':
+      removeRule(request.removedId);
+      break;
+    case 'ClearAllRules':
+      clearAllRules();
       break;
     default:
       break;
@@ -70,31 +80,6 @@ const enableAutoReply = () => {
     const chatMessageTextarea = document.querySelector('div.chat-interface textarea.chat_text_input');
     const chatSendMessageBtn = document.querySelector('div.chat-interface div.chat-buttons-container button');
 
-    // let i = 0;
-    // setInterval(() => {
-    //   if (i === newChatLineLIs.length) {
-    //     return;
-    //   }
-
-    //   const fromText = newChatLineLIs[i].querySelector('span.from').innerText;
-
-    //   const selfUserName = document.querySelector('dl dt span.js-username').innerText;
-    //   if (fromText.trim() === '' || fromText === 'Jtv' || fromText === selfUserName) {
-    //     return;
-    //   }
-
-    //   const messageText = newChatLineLIs[i].querySelector('span.message').innerText;
-
-    //   chatMessageTextarea.focus();
-    //   chatMessageTextarea.value = fromText + ' ' + defaultReply;
-    //   chatSendMessageBtn.focus();
-    //   chatSendMessageBtn.click();
-
-    //   // console.log(fromText + ': ' + messageText);
-
-    //   ++i;
-    // }, reactionTimeOfReply);
-
     for (let i = 0; i < newChatLineLIs.length; ++i) {
       const fromText = newChatLineLIs[i].querySelector('span.from').innerText;
 
@@ -105,16 +90,50 @@ const enableAutoReply = () => {
 
       const messageText = newChatLineLIs[i].querySelector('span.message').innerText;
 
-      chatMessageTextarea.focus();
-      chatMessageTextarea.value = fromText + ' ' + defaultReply; // TODO: Check rules.
-      chatSendMessageBtn.focus();
-      chatSendMessageBtn.click();
+      let isMatch = false;
+      for (let key in rules) {
+        if (messageText.includes(key)) {
+          isMatch = true;
+
+          const reply = rules[key];
+
+          chatMessageTextarea.focus();
+          chatMessageTextarea.value = fromText + ' ' + reply;
+          chatSendMessageBtn.focus();
+          chatSendMessageBtn.click();
+        }
+      }
+
+      if (!isMatch) {
+        chatMessageTextarea.focus();
+        chatMessageTextarea.value = fromText + ' ' + defaultReply;
+        chatSendMessageBtn.focus();
+        chatSendMessageBtn.click();
+      }
 
       // console.log(fromText + ': ' + messageText);
     }
   }, intervalTime);
 };
 
-const addRule = (textIncluded, textToReply) => {
-  rules[textIncluded] = textToReply;
+const addRule = (textIncluded, reply) => {
+  rules[textIncluded] = reply;
+
+  saveRules();
+};
+
+const removeRule = (id) => {
+  delete rules[id];
+
+  saveRules();
+};
+
+const clearAllRules = () => {
+  rules = {};
+
+  saveRules();
+};
+
+const saveRules = () => {
+  chrome.storage.sync.set({rules});
 };

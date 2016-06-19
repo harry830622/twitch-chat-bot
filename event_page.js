@@ -6,7 +6,9 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.set(
     {
       isAutoReplyEnabled: false,
+      intervalId: undefined,
       defaultReply: undefined,
+      rules: {},
     }
   );
 });
